@@ -2,6 +2,7 @@
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
+import Aside from "./components/Aside";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Productos from "./pages/Productos";
@@ -10,9 +11,9 @@ import Blogs from "./pages/Blogs";
 import Contacto from "./pages/Contacto";
 import InicioSesion from "./pages/InicioSesion";
 import RegistroUsuario from "./pages/RegistroUsuario";
-import "./styles/global.css"; // Importar estilos globales
+import "./styles/global.css";
 
-// Crear páginas placeholder temporales
+// Páginas placeholder mejoradas
 const PlaceholderPage = ({ title, children }) => (
   <div>
     <h1>{title}</h1>
@@ -26,6 +27,7 @@ export default function App() {
     <div className="app">
       <Header />
       <Navbar />
+      <Aside /> {/* ✅ Aside agregado aquí */}
       <main className="main-content">
         <div className="container">
           <Routes>
@@ -34,8 +36,8 @@ export default function App() {
             <Route path="/nosotros" element={<PlaceholderPage title="Nosotros" />} />
             <Route path="/blogs" element={<PlaceholderPage title="Blogs" />} />
             <Route path="/contacto" element={<PlaceholderPage title="Contacto" />} />
-            <Route path="/inicio-sesion" element={<PlaceholderPage title="Iniciar Sesión" />} />
-            <Route path="/registro" element={<PlaceholderPage title="Registro" />} />
+            <Route path="/inicio-sesion" element={<InicioSesion />} />
+            <Route path="/registro" element={<RegistroUsuario />} />
           </Routes>
         </div>
       </main>
