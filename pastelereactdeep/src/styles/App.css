@@ -1,0 +1,10 @@
+/* Estilos específicos de React si son necesarios */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
