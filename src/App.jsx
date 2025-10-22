@@ -11,6 +11,9 @@ import Blogs from "./pages/Blogs";
 import Contacto from "./pages/Contacto";
 import InicioSesion from "./pages/InicioSesion";
 import RegistroUsuario from "./pages/RegistroUsuario";
+import DetalleBlog1 from "./pages/DetalleBlog1";
+import DetalleBlog2 from "./pages/DetalleBlog2";
+import DetalleProducto from "./pages/DetalleProducto";
 import "./styles/global.css";
 
 // Páginas placeholder mejoradas
@@ -32,12 +35,15 @@ export default function App() {
         <div className="container">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/productos" element={<PlaceholderPage title="Productos" />} />
-            <Route path="/nosotros" element={<PlaceholderPage title="Nosotros" />} />
-            <Route path="/blogs" element={<PlaceholderPage title="Blogs" />} />
-            <Route path="/contacto" element={<PlaceholderPage title="Contacto" />} />
+            <Route path="/productos" element={<Productos/>} />
+            <Route path="/nosotros" element={<Nosotros/>} />
+            <Route path="/blogs" element={<Blogs />} />
+            <Route path="/contacto" element={<Contacto/>} />
             <Route path="/inicio-sesion" element={<InicioSesion />} />
             <Route path="/registro" element={<RegistroUsuario />} />
+            <Route path="/detalle-blog-1" element={<DetalleBlog1 />} />
+            <Route path="/detalle-blog-2" element={<DetalleBlog2 />} />
+            <Route path="/detalle-producto/:id" element={<DetalleProducto />} />
           </Routes>
         </div>
       </main>
