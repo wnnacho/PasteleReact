@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
+import tcchocolate from '../assets/tcchocolate.webp';
 
 const Home = () => {
   return (
@@ -7,17 +9,20 @@ const Home = () => {
       <h1>Bienvenido a Pastelería Mil Sabores</h1>
       
       <section style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <img src={logo} alt="Pasteleria Mil Sabores" style={{ maxWidth: '260px', marginBottom: '1rem' }} />
         <div style={{ 
           height: '300px', 
-          backgroundColor: '#FFC0CB', 
+          backgroundImage: `url(${tcchocolate})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           borderRadius: '8px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#5D4037',
+          color: '#fff',
           fontSize: '1.2rem'
         }}>
-          Logo de Pastelería Mil Sabores
+          Nuestros mejores sabores
         </div>
       </section>
       

@@ -27,22 +27,45 @@ const InicioSesion = () => {
     }
     
     // Validar credenciales
-    if (formData.email === adminCredentials.email && formData.password === adminCredentials.password) {
-      localStorage.setItem('userRole', 'admin')
-      localStorage.setItem('userEmail', formData.email)
-      alert('Inicio de sesión como administrador exitoso')
-      navigate('/admin')
-    } else {
-      localStorage.setItem('userRole', 'user')
-      localStorage.setItem('userEmail', formData.email)
-      
-      if (formData.email.includes('@duoc.cl') || formData.email.includes('@duocuc.cl')) {
-        alert('¡Hola estudiante Duoc! Tienes beneficios especiales')
+    // If admin email is used, require exact admin password
+    if (formData.email === adminCredentials.email) {
+      if (formData.password === adminCredentials.password) {
+        localStorage.setItem('userRole', 'admin')
+        localStorage.setItem('userEmail', formData.email)
+        alert('Inicio de sesión como administrador exitoso')
+        navigate('/admin')
+      } else {
+        alert('Credenciales inválidas para el administrador')
       }
-      
-      alert('Inicio de sesión exitoso')
-      navigate('/')
+      return
     }
+
+    // For non-admin emails: require registration and matching password
+    const usersRaw = localStorage.getItem('users')
+    let users = []
+    try {
+      users = usersRaw ? JSON.parse(usersRaw) : []
+    } catch (err) {
+      console.error('Error parsing users from localStorage', err)
+      users = []
+    }
+
+    const registered = users.find(u => u.email === formData.email && u.password === formData.password)
+    if (!registered) {
+      alert('Credenciales inválidas. Asegúrate de haberte registrado y de usar la contraseña correcta.')
+      return
+    }
+
+    // Successful normal user login
+    localStorage.setItem('userRole', 'user')
+    localStorage.setItem('userEmail', formData.email)
+
+    if (formData.email.includes('@duoc.cl') || formData.email.includes('@duocuc.cl')) {
+      alert('¡Hola estudiante Duoc! Tienes beneficios especiales')
+    }
+
+    alert('Inicio de sesión exitoso')
+    navigate('/')
   }
 
   return (
@@ -93,7 +116,7 @@ const InicioSesion = () => {
         
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
           <p>¿No tienes cuenta? <a href="/registro" style={{ color: '#884513' }}>Regístrate aquí</a></p>
-          <p><a href="#" style={{ color: '#884513' }}>¿Olvidaste tu contraseña?</a></p>
+          <p><button type="button" onClick={() => alert('Funcionalidad de recuperar contraseña no implementada')} style={{ color: '#884513', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>¿Olvidaste tu contraseña?</button></p>
         </div>
         
         <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#FFF5E1', borderRadius: '4px' }}>

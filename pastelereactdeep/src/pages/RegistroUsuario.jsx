@@ -53,6 +53,21 @@ const RegistroUsuario = () => {
     }
     
     // Simulación de registro exitoso
+    // Guardar usuario en localStorage (simulación simple) con validación de email duplicado
+    try {
+      const usersRaw = localStorage.getItem('users')
+      const users = usersRaw ? JSON.parse(usersRaw) : []
+      const exists = users.find(u => u.email === formData.email)
+      if (exists) {
+        alert('Ya existe una cuenta con ese email. Por favor inicia sesión o usa otro email.')
+        return
+      }
+      users.push({ email: formData.email, password: formData.password, nombre: formData.nombre })
+      localStorage.setItem('users', JSON.stringify(users))
+    } catch (err) {
+      console.error('Error guardando usuario', err)
+    }
+
     alert('Registro exitoso')
     navigate('/')
   }

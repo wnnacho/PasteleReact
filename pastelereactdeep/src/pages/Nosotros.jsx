@@ -1,4 +1,5 @@
 import React from 'react';
+import arbolito from '../assets/arbolito.png';
 
 const Nosotros = () => {
   return (
@@ -6,17 +7,7 @@ const Nosotros = () => {
       <h1>Sobre Nosotros</h1>
       
       <section style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <div style={{ 
-          height: '300px', 
-          backgroundColor: '#FFC0CB', 
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#5D4037'
-        }}>
-          Imagen de Nuestra Historia
-        </div>
+        <img src={arbolito} alt="Historia" style={{ maxWidth: '320px', marginBottom: '1rem' }} />
       </section>
       
       <section style={{ marginBottom: '2rem' }}>
