@@ -47,12 +47,9 @@ const HomeAdmin = () => {
         Pastelería Mil Sabores - Panel de Administración
         <div style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{adminEmail}</div>
       </header>
+      
       <nav style={{ backgroundColor: '#3498DB', padding: '1rem 0', textAlign: 'center' }}>
         <button type="button" onClick={() => navigate('/admin')} style={{ background: 'transparent', border: 'none', color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', margin: '0 0.5rem' }} className="active">Dashboard</button>
-        <button type="button" onClick={() => {}} style={{ background: 'transparent', border: 'none', color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', margin: '0 0.5rem' }}>Productos</button>
-        <button type="button" onClick={() => {}} style={{ background: 'transparent', border: 'none', color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', margin: '0 0.5rem' }}>Pedidos</button>
-        <button type="button" onClick={() => {}} style={{ background: 'transparent', border: 'none', color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', margin: '0 0.5rem' }}>Usuarios</button>
-        <button type="button" onClick={() => {}} style={{ background: 'transparent', border: 'none', color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', margin: '0 0.5rem' }}>Blogs</button>
         <button type="button" onClick={cerrarSesion} style={{ background: 'transparent', border: 'none', color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', margin: '0 0.5rem' }}>Cerrar Sesión</button>
       </nav>
       
