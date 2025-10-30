@@ -1,8 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('renders the app with header', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const headerElement = screen.getByRole('banner');
+  expect(headerElement).toHaveTextContent(/Pastelería Mil Sabores/i);
+});
+
+test('renders the home page by default', () => {
+  render(<App />);
+  const welcomeElement = screen.getByText(/Bienvenido a Pastelería Mil Sabores/i);
+  expect(welcomeElement).toBeInTheDocument();
 });
