@@ -1,23 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ProductoService } from '../services/ProductoService';
-
-// Importar todas las imágenes
-import tcchocolate from '../assets/tcchocolate.webp';
-import tccfrutas from '../assets/tccfrutas.jpg';
-import tcvainilla from '../assets/tcvainilla.jpg';
-import tcmanjar from '../assets/tcmanjar.jpg';
-import mchocolate from '../assets/mchocolate.jpg';
-import tiramisu from '../assets/tiramisu.jpg';
-import tsanaranja from '../assets/tsanaranja.webp';
-import cheesecake from '../assets/cheesecake.jpg';
-import emanzana from '../assets/emanzana.jpg';
-import tsantiago from '../assets/tsantiago.jpg';
-import brownie from '../assets/brownie.jpg';
-import pan from '../assets/pan.jpg';
-import tcvegana from '../assets/tcvegana.jpeg';
-import galletas from '../assets/galletas.jpg';
-import tortacumple from '../assets/tortacumple.jpg';
-import tortaboda from '../assets/tortaboda.jpeg';
+import { CarritoService } from '../services/CarritoService';
 
 const Productos = () => {
   const [carritoAbierto, setCarritoAbierto] = useState(false);
@@ -38,6 +21,9 @@ const Productos = () => {
 const [productos, setProductos] = useState([]);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
+
+// Email temporal - luego lo reemplazaremos con autenticación real
+const [usuarioEmail] = useState('usuario@ejemplo.com');
 
 // Cargar productos desde la API
 useEffect(() => {
@@ -72,23 +58,28 @@ useEffect(() => {
     ? productos 
     : productos.filter(producto => producto.categoria === categoriaFiltro);
 
-  const agregarAlCarrito = (id) => {
+  const agregarAlCarrito = async (id) => {
+  try {
     const producto = productos.find(p => p.id === id);
-    const itemExistente = carrito.find(item => item.id === id);
-    
-    let nuevoCarrito;
-    if (itemExistente) {
-      nuevoCarrito = carrito.map(item => 
-        item.id === id ? { ...item, cantidad: item.cantidad + 1 } : item
-      );
-    } else {
-      nuevoCarrito = [...carrito, { ...producto, cantidad: 1 }];
+    let mensajePersonalizado = '';
+
+    if (producto.personalizable) {
+      mensajePersonalizado = prompt(`"${producto.nombre}" es personalizable.\nIngresa el mensaje:`, '') || '';
     }
+
+    // Llamar al backend
+    await CarritoService.agregarAlCarrito(usuarioEmail, id, 1, mensajePersonalizado);
     
+    // Actualizar carrito local
+    const nuevoCarrito = await CarritoService.getCarrito(usuarioEmail);
     setCarrito(nuevoCarrito);
-    localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
+    
     mostrarNotificacion(`${producto.nombre} agregado al carrito`, 'success');
-  };
+  } catch (error) {
+    console.error('Error agregando al carrito:', error);
+    mostrarNotificacion('Error al agregar al carrito', 'error');
+  }
+};
 
   // Mostrar detalles en modal
   const mostrarDetallesProducto = (id) => {
@@ -137,79 +128,111 @@ useEffect(() => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [mostrarModal]);
 
-  const vaciarCarrito = () => {
-    setCarrito([]);
-    localStorage.removeItem('carrito');
-    mostrarNotificacion('Carrito vaciado', 'info');
-  };
-
-  const procesarCompra = () => {
+  const vaciarCarrito = async () => {
+  try {
     if (carrito.length === 0) {
-      mostrarNotificacion('El carrito está vacío', 'error');
+      mostrarNotificacion('El carrito ya está vacío', 'info');
       return;
     }
 
-    const total = carrito.reduce((t, item) => t + (item.precio * item.cantidad), 0);
-    const confirmar = window.confirm(`¿Confirmar compra?\n\nTotal: $${total.toLocaleString('es-CL')}\n\nProductos: ${carrito.reduce((total, item) => total + item.cantidad, 0)}`);
+    const confirmar = window.confirm('¿Estás seguro de que quieres vaciar el carrito?');
+    if (!confirmar) return;
 
-    if (confirmar) {
-      mostrarNotificacion('¡Compra realizada con éxito! Te contactaremos pronto.', 'success');
-      setCarrito([]);
-      localStorage.removeItem('carrito');
-      setCarritoAbierto(false);
-    }
-  };
-
-  const eliminarDelCarrito = (id) => {
-    const nuevoCarrito = carrito.filter(item => item.id !== id);
-    setCarrito(nuevoCarrito);
-    localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
-  };
-
-  const aumentarCantidad = (id) => {
-    const nuevoCarrito = carrito.map(item => item.id === id ? { ...item, cantidad: item.cantidad + 1 } : item);
-    setCarrito(nuevoCarrito);
-    localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
-  };
-
-  const disminuirCantidad = (id) => {
-    const item = carrito.find(i => i.id === id);
-    if (!item) return;
-    let nuevoCarrito;
-    if (item.cantidad <= 1) {
-      nuevoCarrito = carrito.filter(i => i.id !== id);
-    } else {
-      nuevoCarrito = carrito.map(i => i.id === id ? { ...i, cantidad: i.cantidad - 1 } : i);
-    }
-    setCarrito(nuevoCarrito);
-    localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
-  };
-
-  const editarMensaje = (id) => {
-    const item = carrito.find(i => i.id === id);
-    if (!item) return;
-    const nuevo = prompt('Edita tu mensaje personalizado (máx. 100 caracteres):', item.mensajePersonalizado || '');
-    if (nuevo === null) return;
-    let mensajeFinal = nuevo;
-    if (nuevo.length > 100) {
-      mensajeFinal = nuevo.substring(0, 100);
-      mostrarNotificacion('El mensaje se ha truncado a 100 caracteres', 'info');
-    }
-    const nuevoCarrito = carrito.map(i => i.id === id ? { ...i, mensajePersonalizado: mensajeFinal } : i);
-    setCarrito(nuevoCarrito);
-    localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
-    if (mensajeFinal.trim() !== '') mostrarNotificacion('Mensaje actualizado correctamente', 'success');
-  };
-  if (loading) {
-    return (
-      <div className="container">
-        <h1>Nuestros Productos</h1>
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p>Cargando productos...</p>
-        </div>
-      </div>
-    );
+    await CarritoService.vaciarCarrito(usuarioEmail);
+    setCarrito([]);
+    mostrarNotificacion('Carrito vaciado correctamente', 'success');
+  } catch (error) {
+    console.error('Error en vaciarCarrito:', error);
+    mostrarNotificacion('Error al vaciar el carrito: ' + error.message, 'error');
   }
+};
+
+  const procesarCompra = async () => {
+  if (carrito.length === 0) {
+    mostrarNotificacion('El carrito está vacío', 'error');
+    return;
+  }
+
+  const total = carrito.reduce((t, item) => t + (item.producto.precio * item.cantidad), 0);
+  const cantidadTotal = carrito.reduce((total, item) => total + item.cantidad, 0);
+  
+  const confirmar = window.confirm(`¿Confirmar compra?\n\nTotal: $${total.toLocaleString('es-CL')}\n\nProductos: ${cantidadTotal}`);
+
+  if (confirmar) {
+    try {
+      await CarritoService.vaciarCarrito(usuarioEmail);
+      setCarrito([]);
+      setCarritoAbierto(false);
+      mostrarNotificacion('¡Compra realizada con éxito! Te contactaremos pronto.', 'success');
+    } catch (error) {
+      console.error('Error en procesarCompra:', error);
+      mostrarNotificacion('Error al procesar la compra: ' + error.message, 'error');
+    }
+  }
+};
+
+  const eliminarDelCarrito = async (id) => {
+  try {
+    await CarritoService.eliminarDelCarrito(usuarioEmail, id);
+    const nuevoCarrito = await CarritoService.getCarrito(usuarioEmail);
+    setCarrito(nuevoCarrito);
+  } catch (error) {
+    console.error('Error eliminando del carrito:', error);
+  }
+};
+
+  const aumentarCantidad = async (id) => {
+  try {
+    const item = carrito.find(i => i.producto.id === id);
+    await CarritoService.actualizarCantidad(usuarioEmail, id, item.cantidad + 1);
+    const nuevoCarrito = await CarritoService.getCarrito(usuarioEmail);
+    setCarrito(nuevoCarrito);
+  } catch (error) {
+    console.error('Error aumentando cantidad:', error);
+  }
+};
+
+const disminuirCantidad = async (id) => {
+  try {
+    const item = carrito.find(i => i.producto.id === id);
+    if (item.cantidad > 1) {
+      await CarritoService.actualizarCantidad(usuarioEmail, id, item.cantidad - 1);
+    } else {
+      await CarritoService.eliminarDelCarrito(usuarioEmail, id);
+    }
+    const nuevoCarrito = await CarritoService.getCarrito(usuarioEmail);
+    setCarrito(nuevoCarrito);
+  } catch (error) {
+    console.error('Error disminuyendo cantidad:', error);
+  }
+};
+
+  const editarMensaje = async (id) => {
+  const item = carrito.find(i => i.producto.id === id);
+  if (!item) return;
+  
+  const nuevo = prompt('Edita tu mensaje personalizado (máx. 100 caracteres):', item.mensajePersonalizado || '');
+  if (nuevo === null) return;
+  
+  let mensajeFinal = nuevo;
+  if (nuevo.length > 100) {
+    mensajeFinal = nuevo.substring(0, 100);
+    mostrarNotificacion('El mensaje se ha truncado a 100 caracteres', 'info');
+  }
+  
+  try {
+    await CarritoService.actualizarMensaje(usuarioEmail, id, mensajeFinal);
+    const nuevoCarrito = await CarritoService.getCarrito(usuarioEmail);
+    setCarrito(nuevoCarrito);
+    
+    if (mensajeFinal.trim() !== '') {
+      mostrarNotificacion('Mensaje actualizado correctamente', 'success');
+    }
+  } catch (error) {
+    console.error('Error actualizando mensaje:', error);
+    mostrarNotificacion('Error al actualizar el mensaje: ' + error.message, 'error');
+  }
+};
 
   if (error) {
     return (
@@ -254,36 +277,36 @@ useEffect(() => {
           ) : (
             <>
               {carrito.map(item => (
-                <div key={item.id} style={{ 
-                  marginBottom: '1rem', 
-                  padding: '1rem', 
-                  background: '#f8f8f8', 
-                  borderRadius: '4px' 
-                }}>
-                  <strong>{item.nombre}</strong><br />
-                  Precio: ${item.precio.toLocaleString('es-CL')} x {item.cantidad} = ${(item.precio * item.cantidad).toLocaleString('es-CL')}
-                  {item.mensajePersonalizado && (
-                    <><br /><strong>Mensaje:</strong> "{item.mensajePersonalizado}"</>
-                  )}
-                  {!item.mensajePersonalizado && item.personalizable && (
-                    <><br /><em>Sin mensaje personalizado</em></>
-                  )}
-                  <div style={{ marginTop: '0.5rem' }}>
-                    <button onClick={() => aumentarCantidad(item.id)} className="btn" style={{ padding: '0.25rem 0.5rem', margin: '0.25rem' }}>+</button>
-                    <button onClick={() => disminuirCantidad(item.id)} className="btn" style={{ padding: '0.25rem 0.5rem', margin: '0.25rem' }}>-</button>
-                    {item.personalizable && (
-                      <button onClick={() => editarMensaje(item.id)} className="btn" style={{ padding: '0.25rem 0.5rem', margin: '0.25rem' }}>Editar mensaje</button>
-                    )}
-                    <button 
-                      onClick={() => eliminarDelCarrito(item.id)} 
-                      className="btn btn-secondary"
-                      style={{ padding: '0.25rem 0.5rem', margin: '0.25rem' }}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              ))}
+  <div key={item.id} style={{ 
+    marginBottom: '1rem', 
+    padding: '1rem', 
+    background: '#f8f8f8', 
+    borderRadius: '4px' 
+  }}>
+    <strong>{item.producto.nombre}</strong><br />
+    Precio: ${item.producto.precio.toLocaleString('es-CL')} x {item.cantidad} = ${(item.producto.precio * item.cantidad).toLocaleString('es-CL')}
+    {item.mensajePersonalizado && (
+      <><br /><strong>Mensaje:</strong> "{item.mensajePersonalizado}"</>
+    )}
+    {!item.mensajePersonalizado && item.producto.personalizable && (
+      <><br /><em>Sin mensaje personalizado</em></>
+    )}
+    <div style={{ marginTop: '0.5rem' }}>
+      <button onClick={() => aumentarCantidad(item.producto.id)} className="btn" style={{ padding: '0.25rem 0.5rem', margin: '0.25rem' }}>+</button>
+      <button onClick={() => disminuirCantidad(item.producto.id)} className="btn" style={{ padding: '0.25rem 0.5rem', margin: '0.25rem' }}>-</button>
+      {item.producto.personalizable && (
+        <button onClick={() => editarMensaje(item.producto.id)} className="btn" style={{ padding: '0.25rem 0.5rem', margin: '0.25rem' }}>Editar mensaje</button>
+      )}
+      <button 
+        onClick={() => eliminarDelCarrito(item.producto.id)} 
+        className="btn btn-secondary"
+        style={{ padding: '0.25rem 0.5rem', margin: '0.25rem' }}
+      >
+        Eliminar
+      </button>
+    </div>
+  </div>
+))}
               <div style={{ marginTop: '1rem' }}>
                 <button onClick={vaciarCarrito} className="btn btn-secondary">
                   Vaciar Carrito
