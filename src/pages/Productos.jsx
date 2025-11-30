@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ProductoService } from '../services/ProductoService';
 
 // Importar todas las imágenes
 import tcchocolate from '../assets/tcchocolate.webp';
@@ -33,153 +34,29 @@ const Productos = () => {
     setTimeout(() => setNotification(null), 3000);
   }
 
-  // Productos de ejemplo con las imágenes importadas
-  const productos = [
-  { 
-    id: 'TC001', 
-    categoria: 'Tortas Cuadradas', 
-    nombre: 'Torta Cuadrada de Chocolate', 
-    precio: 45000, 
-    imagen: tcchocolate,
-    descripcion: 'Deliciosa torta de chocolate con capas de ganache y un toque de avellanas. Personalizable con mensajes especiales.',
-    personalizable: true
-  },
-  { 
-    id: 'TC002', 
-    categoria: 'Tortas Cuadradas', 
-    nombre: 'Torta Cuadrada de Frutas', 
-    precio: 50000, 
-    imagen: tccfrutas,
-    descripcion: 'Una mezcla de frutas frescas y crema chantilly sobre un suave bizcocho de vainilla, ideal para celebraciones.',
-    personalizable: false
-  },
-  { 
-    id: 'TT001', 
-    categoria: 'Tortas Circulares', 
-    nombre: 'Torta Circular de Vainilla', 
-    precio: 40000, 
-    imagen: tcvainilla,
-    descripcion: 'Bizcocho de vainilla clásico relleno con crema pastelera y cubierto con un glaseado dulce, perfecto para cualquier ocasión.',
-    personalizable: false
-  },
-  { 
-    id: 'TT002', 
-    categoria: 'Tortas Circulares', 
-    nombre: 'Torta Circular de Manjar', 
-    precio: 42000, 
-    imagen: tcmanjar,
-    descripcion: 'Torta tradicional chilena con manjar y nueces, un deleite para los amantes de los sabores dulces y clásicos.',
-    personalizable: false
-  },
-  { 
-    id: 'PI001', 
-    categoria: 'Postres Individuales', 
-    nombre: 'Mousse de Chocolate', 
-    precio: 5000, 
-    imagen: mchocolate,
-    descripcion: 'Postre individual cremoso y suave, hecho con chocolate de alta calidad, ideal para los amantes del chocolate.',
-    personalizable: false
-  },
-  { 
-    id: 'PI002', 
-    categoria: 'Postres Individuales', 
-    nombre: 'Tiramisú Clásico', 
-    precio: 5500, 
-    imagen: tiramisu,
-    descripcion: 'Un postre italiano individual con capas de café, mascarpone y cacao, perfecto para finalizar cualquier comida.',
-    personalizable: false
-  },
-  { 
-    id: 'PSA001', 
-    categoria: 'Productos Sin Azúcar', 
-    nombre: 'Torta Sin Azúcar de Naranja', 
-    precio: 48000, 
-    imagen: tsanaranja,
-    descripcion: 'Torta ligera y deliciosa, endulzada naturalmente, ideal para quienes buscan opciones más saludables.',
-    personalizable: false
-  },
-  { 
-    id: 'PSA002', 
-    categoria: 'Productos Sin Azúcar', 
-    nombre: 'Cheesecake Sin Azúcar', 
-    precio: 47000, 
-    imagen: cheesecake,
-    descripcion: 'Suave y cremoso, este cheesecake es una opción perfecta para disfrutar sin culpa.',
-    personalizable: false
-  },
-  { 
-    id: 'PT001', 
-    categoria: 'Pastelería Tradicional', 
-    nombre: 'Empanada de Manzana', 
-    precio: 3000, 
-    imagen: emanzana,
-    descripcion: 'Pastelería tradicional rellena de manzanas especiadas, perfecta para un dulce desayuno o merienda.',
-    personalizable: false
-  },
-  { 
-    id: 'PT002', 
-    categoria: 'Pastelería Tradicional', 
-    nombre: 'Tarta de Santiago', 
-    precio: 6000, 
-    imagen: tsantiago,
-    descripcion: 'Tradicional tarta española hecha con almendras, azúcar, y huevos, una delicia para los amantes de los postres clásicos.',
-    personalizable: false
-  },
-  { 
-    id: 'PG001', 
-    categoria: 'Productos Sin Gluten', 
-    nombre: 'Brownie Sin Gluten', 
-    precio: 4000, 
-    imagen: brownie,
-    descripcion: 'Rico y denso, este brownie es perfecto para quienes necesitan evitar el gluten sin sacrificar el sabor.',
-    personalizable: false
-  },
-  { 
-    id: 'PG002', 
-    categoria: 'Productos Sin Gluten', 
-    nombre: 'Pan Sin Gluten', 
-    precio: 3500, 
-    imagen: pan,
-    descripcion: 'Suave y esponjoso, ideal para sándwiches o para acompañar cualquier comida.',
-    personalizable: false
-  },
-  { 
-    id: 'PV001', 
-    categoria: 'Producto Vegano', 
-    nombre: 'Torta Vegana de Chocolate', 
-    precio: 50000, 
-    imagen: tcvegana,
-    descripcion: 'Torta de chocolate húmeda y deliciosa, hecha sin productos de origen animal, perfecta para veganos.',
-    personalizable: false
-  },
-  { 
-    id: 'PV002', 
-    categoria: 'Producto Vegano', 
-    nombre: 'Galletas Veganas de Avena', 
-    precio: 4500, 
-    imagen: galletas,
-    descripcion: 'Crujientes y sabrosas, estas galletas son una excelente opción para un snack saludable y vegano.',
-    personalizable: false
-  },
-  { 
-    id: 'TE001', 
-    categoria: 'Torta Especial', 
-    nombre: 'Torta Especial de Cumpleaños', 
-    precio: 55000, 
-    imagen: tortacumple,
-    descripcion: 'Diseñada especialmente para celebraciones, personalizable con decoraciones y mensajes únicos.',
-    personalizable: true
-  },
-  { 
-    id: 'TE002', 
-    categoria: 'Torta Especial', 
-    nombre: 'Torta Especial de Boda', 
-    precio: 60000, 
-    imagen: tortaboda,
-    descripcion: 'Elegante y deliciosa, esta torta está diseñada para ser el centro de atención en cualquier boda.',
-    personalizable: false
-  }
-];
+  // Estado para productos desde la API
+const [productos, setProductos] = useState([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
+
+// Cargar productos desde la API
+useEffect(() => {
+  const cargarProductos = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const productosData = await ProductoService.getProductos();
+      setProductos(productosData);
+    } catch (err) {
+      setError('Error al cargar los productos: ' + err.message);
+      console.error('Error cargando productos:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  cargarProductos();
+}, []);
 
   // ... el resto del componente se mantiene igual
   useEffect(() => {
@@ -323,6 +200,36 @@ const Productos = () => {
     localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
     if (mensajeFinal.trim() !== '') mostrarNotificacion('Mensaje actualizado correctamente', 'success');
   };
+  if (loading) {
+    return (
+      <div className="container">
+        <h1>Nuestros Productos</h1>
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <p>Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container">
+        <h1>Nuestros Productos</h1>
+        <div style={{ 
+          background: '#ffebee', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          margin: '2rem 0',
+          color: '#c62828'
+        }}>
+          <p><strong>Error:</strong> {error}</p>
+          <button onClick={() => window.location.reload()} className="btn">
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
