@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+// src/pages/RegistroUsuario.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UsuarioService } from '../services/UsuarioService';
 
 const RegistroUsuario = () => {
   const [formData, setFormData] = useState({
@@ -12,71 +14,104 @@ const RegistroUsuario = () => {
     codigoPromocional: '',
     terminos: false,
     newsletter: true
-  })
-  const navigate = useNavigate()
+  });
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({
       ...formData,
       [e.target.name]: value
-    })
-  }
+    });
+    setError(''); // Limpiar error al cambiar
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
     
     // Validar que las contraseñas coincidan
     if (formData.password !== formData.confirmPassword) {
-      alert('Las contraseñas no coinciden')
-      return
+      setError('Las contraseñas no coinciden');
+      setLoading(false);
+      return;
     }
     
-    // Validar edad para descuento
-    const fechaNacimiento = new Date(formData.fechaNacimiento)
-    const hoy = new Date()
-    const edad = hoy.getFullYear() - fechaNacimiento.getFullYear()
-    
-    // Validar código promocional
-    if (formData.codigoPromocional && formData.codigoPromocional.toUpperCase() === 'FELICES50') {
-      alert('¡Código FELICES50 aplicado! Obtendrás 10% de descuento permanente')
-    }
-    
-    // Validar si es estudiante Duoc
-    if (formData.email.includes('@duoc.cl') || formData.email.includes('@duocuc.cl')) {
-      alert('¡Estudiante Duoc detectado! Recibirás torta gratis en tu cumpleaños')
-    }
-    
-    // Validar si es mayor de 50 años
-    if (edad > 50) {
-      alert('¡Obtendrás 50% de descuento por ser mayor de 50 años!')
-    }
-    
-    // Simulación de registro exitoso
-    // Guardar usuario en localStorage (simulación simple) con validación de email duplicado
-    try {
-      const usersRaw = localStorage.getItem('users')
-      const users = usersRaw ? JSON.parse(usersRaw) : []
-      const exists = users.find(u => u.email === formData.email)
-      if (exists) {
-        alert('Ya existe una cuenta con ese email. Por favor inicia sesión o usa otro email.')
-        return
-      }
-      users.push({ email: formData.email, password: formData.password, nombre: formData.nombre })
-      localStorage.setItem('users', JSON.stringify(users))
-    } catch (err) {
-      console.error('Error guardando usuario', err)
+    // Validar términos
+    if (!formData.terminos) {
+      setError('Debes aceptar los términos y condiciones');
+      setLoading(false);
+      return;
     }
 
-    alert('Registro exitoso')
-    navigate('/')
-  }
+    try {
+      // Preparar datos para el backend
+      const usuarioData = {
+        email: formData.email,
+        nombre: formData.nombre,
+        password: formData.password,
+        fechaNacimiento: formData.fechaNacimiento || null,
+        telefono: formData.telefono || ''
+      };
+
+      // Llamar al servicio de registro
+      const response = await UsuarioService.registrar(usuarioData);
+      
+      // Guardar usuario en sesión
+      UsuarioService.guardarUsuarioSesion(response.usuario);
+      
+      // Preparar mensaje con beneficios
+      let mensaje = '¡Registro exitoso!';
+      let beneficios = [];
+      
+      if (response.usuario.mayor50) {
+        beneficios.push('50% de descuento por ser mayor de 50 años');
+      }
+      if (response.usuario.esEstudianteDuoc) {
+        beneficios.push('Torta gratis en tu cumpleaños');
+      }
+      if (formData.codigoPromocional?.toUpperCase() === 'FELICES50') {
+        beneficios.push('10% de descuento permanente con código FELICES50');
+      }
+      
+      if (beneficios.length > 0) {
+        mensaje += '\n\nBeneficios obtenidos:\n• ' + beneficios.join('\n• ');
+      }
+      
+      alert(mensaje);
+      navigate('/');
+      
+    } catch (error) {
+      console.error('Error en registro:', error);
+      setError(error.response?.data?.error || 'Error en el registro. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="container">
       <h1>Crear Cuenta</h1>
       
       <div style={{ maxWidth: '500px', margin: '0 auto', background: 'white', padding: '2rem', borderRadius: '8px' }}>
+        
+        {error && (
+          <div style={{ 
+            background: '#f8d7da', 
+            color: '#721c24', 
+            padding: '0.75rem', 
+            borderRadius: '4px', 
+            marginBottom: '1rem',
+            fontSize: '0.9rem'
+          }}>
+            {error}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="nombre">Nombre completo *</label>
@@ -87,6 +122,7 @@ const RegistroUsuario = () => {
               value={formData.nombre}
               onChange={handleChange}
               required 
+              disabled={loading}
             />
           </div>
           
@@ -99,6 +135,7 @@ const RegistroUsuario = () => {
               value={formData.email}
               onChange={handleChange}
               required 
+              disabled={loading}
             />
           </div>
           
@@ -111,6 +148,7 @@ const RegistroUsuario = () => {
               value={formData.fechaNacimiento}
               onChange={handleChange}
               required 
+              disabled={loading}
             />
           </div>
           
@@ -122,6 +160,7 @@ const RegistroUsuario = () => {
               name="telefono" 
               value={formData.telefono}
               onChange={handleChange}
+              disabled={loading}
             />
           </div>
           
@@ -134,6 +173,7 @@ const RegistroUsuario = () => {
               value={formData.password}
               onChange={handleChange}
               required 
+              disabled={loading}
             />
           </div>
           
@@ -146,6 +186,7 @@ const RegistroUsuario = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               required 
+              disabled={loading}
             />
           </div>
           
@@ -157,7 +198,8 @@ const RegistroUsuario = () => {
               name="codigoPromocional" 
               value={formData.codigoPromocional}
               onChange={handleChange}
-              placeholder="Ej: FELICES50" 
+              placeholder="Ej: FELICES50"
+              disabled={loading}
             />
           </div>
           
@@ -169,8 +211,11 @@ const RegistroUsuario = () => {
               checked={formData.terminos}
               onChange={handleChange}
               required 
+              disabled={loading}
             />
-            <label htmlFor="terminos">Acepto los términos y condiciones *</label>
+            <label htmlFor="terminos" style={{ marginLeft: '0.5rem' }}>
+              Acepto los términos y condiciones *
+            </label>
           </div>
           
           <div style={{ marginBottom: '1rem' }}>
@@ -180,12 +225,20 @@ const RegistroUsuario = () => {
               name="newsletter" 
               checked={formData.newsletter}
               onChange={handleChange}
+              disabled={loading}
             />
-            <label htmlFor="newsletter">Deseo recibir newsletter y promociones</label>
+            <label htmlFor="newsletter" style={{ marginLeft: '0.5rem' }}>
+              Deseo recibir newsletter y promociones
+            </label>
           </div>
           
-          <button type="submit" className="btn" style={{ width: '100%' }}>
-            Crear Cuenta
+          <button 
+            type="submit" 
+            className="btn" 
+            style={{ width: '100%' }}
+            disabled={loading}
+          >
+            {loading ? 'Registrando...' : 'Crear Cuenta'}
           </button>
         </form>
         
@@ -203,7 +256,7 @@ const RegistroUsuario = () => {
         </div>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default RegistroUsuario
+export default RegistroUsuario;

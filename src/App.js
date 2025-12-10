@@ -21,6 +21,7 @@ import AdminProductos from './pages/admin/AdminProductos';
 import AdminPedidos from './pages/admin/AdminPedidos';
 import AdminBlogs from './pages/admin/AdminBlogs';
 import AdminUsuarios from './pages/admin/AdminUsuarios';
+import MisPedidos from './pages/MisPedidos';
 
 function AppContent() {
   const location = useLocation();
@@ -53,6 +54,7 @@ function AppContent() {
           <Route path="/admin/pedidos" element={<AdminPedidos />} />
           <Route path="/admin/blogs" element={<AdminBlogs />} />
           <Route path="/admin/usuarios" element={<AdminUsuarios />} />
+          <Route path="/mis-pedidos" element={<MisPedidos />} />
         </Routes>
       </main>
       {!isAdminRoute && <Footer />}
