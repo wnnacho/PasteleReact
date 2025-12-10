@@ -21,17 +21,40 @@ const AdminBlogs = () => {
     }
   }, [])
 
+  const adminEmail = localStorage.getItem('userEmail')
   return (
     <div className="admin-theme admin-page admin-blue">
+      <header>
+        Pastelería Mil Sabores - Panel de Administración
+        <div style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{adminEmail}</div>
+      </header>
+      <nav>
+        <button type="button" onClick={() => navigate('/admin')}>Dashboard</button>
+        <button type="button" onClick={() => navigate('/admin/productos')}>Productos</button>
+        <button type="button" onClick={() => navigate('/admin/pedidos')}>Pedidos</button>
+        <button type="button" className="active" onClick={() => navigate('/admin/blogs')}>Blogs</button>
+        <button type="button" onClick={() => navigate('/admin/usuarios')}>Usuarios</button>
+      </nav>
       <div className="container">
         <h2>Blogs (Admin)</h2>
-      {blogs.length === 0 ? (
-        <p>No hay entradas de blog registradas.</p>
-      ) : (
-        <ul>
-          {blogs.map(b => <li key={b.id || b.titulo}>{b.titulo}</li>)}
-        </ul>
-      )}
+        {blogs.length === 0 ? (
+          <p>No hay entradas de blog registradas.</p>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr><th>Título</th><th>Categoría</th><th>Fecha</th></tr>
+            </thead>
+            <tbody>
+              {blogs.map(b => (
+                <tr key={b.id || b.titulo}>
+                  <td>{b.titulo}</td>
+                  <td>{b.categoria || '-'}</td>
+                  <td>{b.fecha || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   )

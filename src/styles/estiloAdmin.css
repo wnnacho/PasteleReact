@@ -5,6 +5,21 @@
     box-sizing: border-box;
 }
 
+.admin-theme {
+    background-color: #EAF6F8; /* cool light cyan */
+    min-height: 100vh;
+}
+
+/* Ensure body uses cool background on admin routes */
+.admin-body {
+    background-color: #EAF6F8 !important;
+}
+
+/* Remove default body margin to avoid stray bars */
+body.admin-body {
+    margin: 0;
+}
+
 .admin-theme .container {
     width: 90%;
     max-width: 1200px;
@@ -23,14 +38,19 @@
     text-align: center;
     font-family: 'Pacifico', cursive;
     font-size: 2rem;
+    margin: 0; /* prevent gap bars */
+    border-bottom: none; /* no separator line */
+    box-shadow: none !important; /* no shadow line */
 }
 
 /* Navegación */
 .admin-theme nav {
-    background-color: #3498DB;
+    background-color: #2C3E50; /* navy */
     padding: 1rem 0;
     text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* remove shadow/bar between nav and content */
+    box-shadow: none !important;
+    border-bottom: none !important;
 }
 
 .admin-theme nav button,
@@ -49,7 +69,7 @@
 
 .admin-theme nav button:hover, .admin-theme nav a:hover,
 .admin-theme nav button.active, .admin-theme nav a.active {
-    background-color: #2980B9;
+    background-color: #1ABC9C; /* cyan accent */
     color: white;
     border-radius: 4px;
 }
@@ -76,6 +96,12 @@
 .admin-theme main {
     padding: 2rem 0;
     min-height: 60vh;
+    border-top: none !important;
+}
+
+/* Add breathing space after the dashboard cards before next section */
+.admin-theme .dashboard-grid {
+    margin-bottom: 2rem;
 }
 
 .admin-theme h1, .admin-theme h2, .admin-theme h3 {
@@ -138,7 +164,7 @@
 }
 
 .admin-theme .admin-table th {
-    background-color: #3498DB;
+    background-color: #2C3E50; /* navy */
     color: white;
     font-weight: bold;
 }
@@ -178,7 +204,7 @@
 }
 
 .admin-theme .btn {
-    background-color: #3498DB;
+    background-color: #1ABC9C; /* cyan */
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -189,7 +215,7 @@
 }
 
 .admin-theme .btn:hover {
-    background-color: #2980B9;
+    background-color: #16A085; /* darker cyan */
 }
 
 .admin-theme .btn-secondary {
@@ -201,12 +227,39 @@
 }
 
 .admin-theme .btn-success {
-    background-color: #2ECC71;
+    background-color: #3498DB; /* blue for save */
 }
 
 .admin-theme .btn-success:hover {
-    background-color: #27AE60;
+    background-color: #2980B9;
 }
+
+/* Outline button */
+.admin-theme .btn.btn-outline {
+    background: transparent;
+    color: #1ABC9C;
+    border: 2px solid #1ABC9C;
+}
+.admin-theme .btn.btn-outline:hover {
+    background: rgba(26, 188, 156, 0.1);
+}
+
+/* Simple card/container */
+.admin-theme .card,
+.admin-theme .admin-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* Two-column grid for forms */
+.admin-theme .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
 
 /* Footer */
 .admin-theme footer {
@@ -267,6 +320,7 @@
     background: white;
     padding: 2rem;
     border-radius: 8px;
+    margin-top: 2.5rem; /* push down from the dashboard cards */
     margin-bottom: 2rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }

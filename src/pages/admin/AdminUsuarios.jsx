@@ -27,8 +27,20 @@ const AdminUsuarios = () => {
     localStorage.setItem('users', JSON.stringify(nueva))
   }
 
+  const adminEmail = localStorage.getItem('userEmail')
   return (
     <div className="admin-theme admin-page admin-blue">
+      <header>
+        Pastelería Mil Sabores - Panel de Administración
+        <div style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{adminEmail}</div>
+      </header>
+      <nav>
+        <button type="button" onClick={() => navigate('/admin')}>Dashboard</button>
+        <button type="button" onClick={() => navigate('/admin/productos')}>Productos</button>
+        <button type="button" onClick={() => navigate('/admin/pedidos')}>Pedidos</button>
+        <button type="button" onClick={() => navigate('/admin/blogs')}>Blogs</button>
+        <button type="button" className="active" onClick={() => navigate('/admin/usuarios')}>Usuarios</button>
+      </nav>
       <div className="container">
         <h2>Usuarios (Admin)</h2>
       {users.length === 0 ? (

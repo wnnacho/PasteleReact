@@ -1,13 +1,22 @@
 import React from 'react';
-import arbolito from '../assets/arbolito.png';
 
+const getBackendBase = () => {
+  try {
+    const u = new URL(window.location.href);
+    const port = u.port === '3000' ? '8080' : (u.port || '8080');
+    return `${u.protocol}//${u.hostname}:${port}`;
+  } catch {
+    return 'http://localhost:8080';
+  }
+};
+const BACKEND = getBackendBase();
 const Nosotros = () => {
   return (
     <div className="container">
       <h1>Sobre Nosotros</h1>
       
       <section style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <img src={arbolito} alt="Historia" style={{ maxWidth: '320px', marginBottom: '1rem' }} />
+        <img src={`${BACKEND}/img/arbolito.png`} alt="Historia" style={{ maxWidth: '320px', marginBottom: '1rem' }} />
       </section>
       
       <section style={{ marginBottom: '2rem' }}>

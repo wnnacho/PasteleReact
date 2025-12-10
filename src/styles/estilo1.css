@@ -13,6 +13,11 @@ body {
     line-height: 1.6;
 }
 
+/* Do not apply public site background when in admin */
+body.admin-body {
+    background-color: #EAF6F8; /* cool admin bg */
+}
+
 #root {
     min-height: 100vh;
     display: flex;
@@ -37,8 +42,8 @@ main {
     padding: 0 15px;
 }
 
-/* Header */
-header {
+/* Header (scoped to public site only) */
+body:not(.admin-body) header {
     background-color: #884513;
     color: white;
     padding: 1.5rem 0;
@@ -47,15 +52,15 @@ header {
     font-size: 2rem;
 }
 
-/* Navegación */
-nav {
+/* Navegación (scoped to public site only) */
+body:not(.admin-body) nav {
     background-color: #FFC0CB;
     padding: 1rem 0;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-nav a {
+body:not(.admin-body) nav a {
     color: #5D4037;
     text-decoration: none;
     padding: 0.5rem 1rem;
@@ -65,7 +70,8 @@ nav a {
     display: inline-block;
 }
 
-nav a:hover, nav a.active {
+body:not(.admin-body) nav a:hover,
+body:not(.admin-body) nav a.active {
     background-color: #884513;
     color: white;
     border-radius: 4px;

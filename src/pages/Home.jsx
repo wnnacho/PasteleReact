@@ -1,7 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png';
-import tcchocolate from '../assets/tcchocolate.webp';
+// Usar imágenes servidas por el backend
+const getBackendBase = () => {
+  try {
+    const u = new URL(window.location.href);
+    const port = u.port === '3000' ? '8080' : (u.port || '8080');
+    return `${u.protocol}//${u.hostname}:${port}`;
+  } catch {
+    return 'http://localhost:8080';
+  }
+};
+const BACKEND = getBackendBase();
 
 const Home = () => {
   return (
@@ -9,10 +18,10 @@ const Home = () => {
       <h1>Bienvenido a Pastelería Mil Sabores</h1>
       
       <section style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <img src={logo} alt="Pasteleria Mil Sabores" style={{ maxWidth: '260px', marginBottom: '1rem' }} />
+        <img src={`${BACKEND}/img/logo.png`} alt="Pasteleria Mil Sabores" style={{ maxWidth: '260px', marginBottom: '1rem' }} />
         <div style={{ 
           height: '300px', 
-          backgroundImage: `url(${tcchocolate})`,
+          backgroundImage: `url(${BACKEND}/img/tcchocolate.webp)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           borderRadius: '8px',

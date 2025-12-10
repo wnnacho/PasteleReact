@@ -1,8 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import tccfrutas from '../assets/tccfrutas.jpg';
-import tiramisu from '../assets/tiramisu.jpg';
-import cheesecake from '../assets/cheesecake.jpg';
+
+// Usar imágenes servidas por el backend desde /img
+const getBackendBase = () => {
+  try {
+    const u = new URL(window.location.href);
+    const port = u.port === '3000' ? '8080' : (u.port || '8080');
+    return `${u.protocol}//${u.hostname}:${port}`;
+  } catch {
+    return 'http://localhost:8080';
+  }
+};
+const BACKEND = getBackendBase();
 
 const Blogs = () => {
   return (
@@ -15,7 +24,7 @@ const Blogs = () => {
       <div className="blog-grid">
         <div className="blog-card">
           <div style={{ height: '200px', overflow: 'hidden', borderRadius: 6 }}>
-            <img src={tccfrutas} alt="Técnicas" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={`${BACKEND}/img/tccfrutas.jpg`} alt="Técnicas" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div className="blog-card-content">
             <h3>5 Técnicas de Decoración para Principiantes</h3>
@@ -26,7 +35,7 @@ const Blogs = () => {
         
         <div className="blog-card">
           <div style={{ height: '200px', overflow: 'hidden', borderRadius: 6 }}>
-            <img src={tiramisu} alt="Recetas" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={`${BACKEND}/img/tiramisu.jpg`} alt="Recetas" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div className="blog-card-content">
             <h3>Recetas Chilenas que no Pueden Faltar</h3>
@@ -37,7 +46,7 @@ const Blogs = () => {
         
         <div className="blog-card">
           <div style={{ height: '200px', overflow: 'hidden', borderRadius: 6 }}>
-            <img src={cheesecake} alt="Saludables" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={`${BACKEND}/img/cheesecake.jpg`} alt="Saludables" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div className="blog-card-content">
             <h3>Postres Sin Azúcar: Mitos y Realidades</h3>

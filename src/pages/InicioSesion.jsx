@@ -1,78 +1,70 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+// src/pages/InicioSesion.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthService } from '../services/AuthService';
 
 const InicioSesion = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     remember: false
-  })
-  const navigate = useNavigate()
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
-    setFormData({
-      ...formData,
-      [e.target.name]: value
-    })
-  }
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    setError('');
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    
-    // Credenciales de administrador
-    const adminCredentials = {
-      email: 'admin@pasteleriamilsabores.cl',
-      password: 'admin123'
-    }
-    
-    // Validar credenciales
-    // If admin email is used, require exact admin password
-    if (formData.email === adminCredentials.email) {
-      if (formData.password === adminCredentials.password) {
-        localStorage.setItem('userRole', 'admin')
-        localStorage.setItem('userEmail', formData.email)
-        alert('Inicio de sesión como administrador exitoso')
-        navigate('/admin')
-      } else {
-        alert('Credenciales inválidas para el administrador')
-      }
-      return
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-    // For non-admin emails: require registration and matching password
-    const usersRaw = localStorage.getItem('users')
-    let users = []
     try {
-      users = usersRaw ? JSON.parse(usersRaw) : []
+      // Usar el servicio de autenticación
+      await AuthService.login(formData.email, formData.password);
+      
+      // Si "recordar sesión" está marcado, ya se guardó en localStorage
+      if (!formData.remember) {
+        // Para sesiones no persistentes, podrías usar sessionStorage
+        // Por ahora usamos localStorage para simplicidad
+      }
+      
+      // Redirigir al panel de administración
+      navigate('/admin');
     } catch (err) {
-      console.error('Error parsing users from localStorage', err)
-      users = []
+      setError('Credenciales inválidas. Usa: admin@pasteleriamilsabores.cl / admin123');
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
     }
-
-    const registered = users.find(u => u.email === formData.email && u.password === formData.password)
-    if (!registered) {
-      alert('Credenciales inválidas. Asegúrate de haberte registrado y de usar la contraseña correcta.')
-      return
-    }
-
-    // Successful normal user login
-    localStorage.setItem('userRole', 'user')
-    localStorage.setItem('userEmail', formData.email)
-
-    if (formData.email.includes('@duoc.cl') || formData.email.includes('@duocuc.cl')) {
-      alert('¡Hola estudiante Duoc! Tienes beneficios especiales')
-    }
-
-    alert('Inicio de sesión exitoso')
-    navigate('/')
-  }
+  };
 
   return (
     <main className="container">
       <h1>Iniciar Sesión</h1>
       
       <div style={{ maxWidth: '400px', margin: '0 auto', background: 'white', padding: '2rem', borderRadius: '8px' }}>
+        {error && (
+          <div style={{ 
+            background: '#f8d7da', 
+            color: '#721c24', 
+            padding: '0.75rem', 
+            borderRadius: '4px', 
+            marginBottom: '1rem',
+            fontSize: '0.9rem'
+          }}>
+            {error}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email *</label>
@@ -83,6 +75,7 @@ const InicioSesion = () => {
               value={formData.email}
               onChange={handleChange}
               required 
+              disabled={loading}
             />
           </div>
           
@@ -95,6 +88,7 @@ const InicioSesion = () => {
               value={formData.password}
               onChange={handleChange}
               required 
+              disabled={loading}
             />
           </div>
           
@@ -105,27 +99,52 @@ const InicioSesion = () => {
               name="remember" 
               checked={formData.remember}
               onChange={handleChange}
+              disabled={loading}
             />
-            <label htmlFor="remember">Recordar mi sesión</label>
+            <label htmlFor="remember" style={{ marginLeft: '0.5rem' }}>
+              Recordar mi sesión
+            </label>
           </div>
           
-          <button type="submit" className="btn" style={{ width: '100%' }}>
-            Iniciar Sesión
+          <button 
+            type="submit" 
+            className="btn" 
+            style={{ width: '100%' }}
+            disabled={loading}
+          >
+            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
         
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
           <p>¿No tienes cuenta? <a href="/registro" style={{ color: '#884513' }}>Regístrate aquí</a></p>
-          <p><button type="button" onClick={() => alert('Funcionalidad de recuperar contraseña no implementada')} style={{ color: '#884513', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>¿Olvidaste tu contraseña?</button></p>
+          <p>
+            <button 
+              type="button" 
+              onClick={() => alert('Funcionalidad de recuperar contraseña no implementada')} 
+              style={{ color: '#884513', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </p>
         </div>
         
         <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#FFF5E1', borderRadius: '4px' }}>
           <h3 style={{ color: '#884513', marginBottom: '0.5rem' }}>¿Eres estudiante Duoc?</h3>
-          <p style={{ fontSize: '0.9rem' }}>Regístrate con tu correo institucional para recibir torta gratis en tu cumpleaños</p>
+          <p style={{ fontSize: '0.9rem' }}>
+            Regístrate con tu correo institucional para recibir torta gratis en tu cumpleaños
+          </p>
+        </div>
+
+        {/* Credenciales de prueba */}
+        <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#e7f3ff', borderRadius: '4px', fontSize: '0.85rem' }}>
+          <strong>Credenciales de prueba:</strong>
+          <p>Email: admin@pasteleriamilsabores.cl</p>
+          <p>Contraseña: admin123</p>
         </div>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default InicioSesion
+export default InicioSesion;

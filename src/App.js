@@ -25,6 +25,14 @@ import AdminUsuarios from './pages/admin/AdminUsuarios';
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  React.useEffect(() => {
+    if (isAdminRoute) {
+      document.body.classList.add('admin-body');
+    } else {
+      document.body.classList.remove('admin-body');
+    }
+    return () => document.body.classList.remove('admin-body');
+  }, [isAdminRoute]);
 
   return (
     <div className="App">
